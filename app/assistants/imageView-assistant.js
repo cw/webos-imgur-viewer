@@ -78,7 +78,7 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
             //Mojo.Log.info(attr);
         }
         for (var img in json.images) {
-            image_list.push(img);
+            image_list.push(json.images[img]);
             //Mojo.Log.info(this.myPhotoDivElement.mojo); //.model.images.push(img);
         }
     } else {
@@ -86,12 +86,10 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
     }
     this.image_model.images = image_list;
     this.controller.modelChanged(this.image_model, this);
+    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].original_image, this.image_model.images[0].small_thumbnail);
 }
 
 ImageViewAssistant.prototype.handleButtonPress = function (event) {
-    this.myPhotoDivElement.mojo.leftUrlProvided('http:\/\/imgur.com\/A5Zui.gif','http:\/\/imgur.com\/A5Zuis.gif');
-    this.myPhotoDivElement.mojo.centerUrlProvided('http:\/\/imgur.com\/11r7j.jpg','http:\/\/imgur.com\/11r7js.jpg');
-    this.myPhotoDivElement.mojo.rightUrlProvided('http:\/\/imgur.com\/65APr.jpg','http:\/\/imgur.com\/65APrs.jpg');
     /* 
      * You can manually set the width and height of the image
      * space as below or you can let the widget pick the size
@@ -118,6 +116,22 @@ ImageViewAssistant.prototype.handleButton2Press = function (event) {
 ImageViewAssistant.prototype.imageViewChanged = function (event) {
     /* Do something when the image view changes */
     //this.showDialogBox("Image View Changed", "Flick image left and/or right to see other images.");
+    Mojo.Log.info("Current image index: " + this.image_model.current_index);
+    var idx = this.image_model.current_index;
+    if (idx === 0) {
+        // Full size, thumb
+        this.myPhotoDivElement.mojo.leftUrlProvided("", "");
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image, this.image_model.images[idx + 1].small_thumbnail);
+    } else if (idx > 0 && idx < this.image_model.images.length) {
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image, this.image_model.images[idx - 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image, this.image_model.images[idx + 1].small_thumbnail);
+    } else if (idx === this.image_model.images.length) {
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image, this.image_model.images[idx - 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided("", "");
+    }
 }
 
 ImageViewAssistant.prototype.wentLeft = function (event) {
@@ -125,6 +139,10 @@ ImageViewAssistant.prototype.wentLeft = function (event) {
      * like picking a different image for the left image.
      */
     //this.showDialogBox("Image View Changed", "Flicked right to see left picture.");
+    if (this.image_model.current_index >= 1) {
+        this.image_model.current_index -= 1;
+        this.controller.modelChanged(this.image_model, this);
+    }
 }
 
 ImageViewAssistant.prototype.wentRight = function (event) {
@@ -132,6 +150,10 @@ ImageViewAssistant.prototype.wentRight = function (event) {
      * like picking a different image for the right image.
      */
     //this.showDialogBox("Image View Changed", "Flicked left to see right picture.");
+    if (this.image_model.current_index <= this.image_model.images.length) {
+        this.image_model.current_index += 1;
+        this.controller.modelChanged(this.image_model, this);
+    }
 }
 
 ImageViewAssistant.prototype.activate = function () {

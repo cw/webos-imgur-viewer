@@ -24,11 +24,8 @@ ImageViewAssistant.prototype.setup = function () {
 
     this.imageViewChanged = this.imageViewChanged.bindAsEventListener(this);
     this.handleButtonPress = this.handleButtonPress.bind(this);
-    this.handleButtonPress = this.handleButtonPress.bind(this);
-    this.handleButton2Press = this.handleButton2Press.bind(this);
-    Mojo.Event.listen(this.controller.get('myPhotoDiv'),Mojo.Event.imageViewChanged,this.imageViewChanged);
-    Mojo.Event.listen(this.controller.get('push_button'),Mojo.Event.tap, this.handleButtonPress);
-    Mojo.Event.listen(this.controller.get('push_button2'),Mojo.Event.tap, this.handleButton2Press);
+    Mojo.Event.listen(this.controller.get('myPhotoDiv'), Mojo.Event.imageViewChanged, this.imageViewChanged);
+    Mojo.Event.listen(this.controller.get('push_button'), Mojo.Event.tap, this.handleButtonPress);
 }
 
 ImageViewAssistant.prototype.getImageUrls = function () {
@@ -85,20 +82,6 @@ ImageViewAssistant.prototype.handleButtonPress = function (event) {
     //this.myPhotoDivElement.mojo.manualSize('300','100');
 }
 
-ImageViewAssistant.prototype.handleButton2Press = function (event) {
-    result = this.myPhotoDivElement.mojo.getCurrentParams();
-    // this.showDialogBox("Current Params", "SourceImage="+result.sourceImage+
-    //"  (See code for this button for other available parameters.)");
-    /*
-     * Besides sourceImage, other result attributes are:
-     * focusX
-     * focusY
-     * scale
-     * sourceWidth
-     * sourceHeight
-     */
-}
-
 // Do something when the image view changes
 ImageViewAssistant.prototype.imageViewChanged = function (event) {
     Mojo.Log.info("Current image index: " + this.image_model.current_index);
@@ -144,15 +127,14 @@ ImageViewAssistant.prototype.deactivate = function () {}
 ImageViewAssistant.prototype.cleanup = function () {
     Mojo.Event.stopListening(this.controller.get('myPhotoDiv'),Mojo.Event.imageViewChanged,this.imageViewChanged);
     Mojo.Event.stopListening(this.controller.get('push_button'),Mojo.Event.tap, this.handleButtonPress);
-    Mojo.Event.stopListening(this.controller.get('push_button2'),Mojo.Event.tap, this.handleButton2Press);
 }
 
 // This function will popup a dialog, displaying the message passed in.
-ImageViewAssistant.prototype.showDialogBox = function (title,message) {
+ImageViewAssistant.prototype.showDialogBox = function (title, message) {
     this.controller.showAlertDialog({
         onChoose: function (value) {},
-        title:title,
-        message:message,
-        choices:[ {label:'OK', value:'OK', type:'color'} ]
+        title: title,
+        message: message,
+        choices: [ {label:'OK', value:'OK', type:'color'} ]
     });
 }

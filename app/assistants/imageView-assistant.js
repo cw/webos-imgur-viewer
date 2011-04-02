@@ -2,8 +2,8 @@ function ImageViewAssistant() {}
 
 ImageViewAssistant.prototype.setup = function () {
     var attributes = {
-        //noExtractFS : true //optional, turn off using extractfs to speed up renders.
-        };
+        noExtractFS: true //optional, turn off using extractfs to speed up renders.
+    };
     this.image_model = {
         //backgroundImage : 'images/glacier.png',
         //background: 'black', //You can set an image or a color
@@ -33,7 +33,6 @@ ImageViewAssistant.prototype.setup = function () {
 
 ImageViewAssistant.prototype.getImageUrls = function () {
     // currently using Imgur API version 1 - TODO this should use version 2 instead
-    Mojo.Log.info("starting getImageUrls");
     var url = "http://imgur.com/api/gallery.json",
         request = new Ajax.Request(url, {
             method: 'get',
@@ -53,40 +52,27 @@ ImageViewAssistant.prototype.getImageUrls = function () {
                 Mojo.Log.error("Exception");
             },
         });
-/*
-        images = [
-            "http:\/\/imgur.com\/A5Zuis.gif",
-            "http:\/\/imgur.com\/11r7js.jpg",
-            "http:\/\/imgur.com\/65APrs.jpg"
-        ];
-*/
 }
 
 ImageViewAssistant.prototype.parseResult = function (transport) {
-    Mojo.Log.info("starting parseResult");
     var image_list = [],
         json,
         data = transport.responseText;
-
     try {
         json = data.evalJSON();
     } catch (e) {
         Mojo.Log.error(e);
     }
     if (json.images) {
-        for (var attr in this.myPhotoDivElement) {
-            //Mojo.Log.info(attr);
-        }
         for (var img in json.images) {
             image_list.push(json.images[img]);
-            //Mojo.Log.info(this.myPhotoDivElement.mojo); //.model.images.push(img);
         }
     } else {
         Mojo.Log.info("json object has no images");
     }
     this.image_model.images = image_list;
     this.controller.modelChanged(this.image_model, this);
-    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].original_image, this.image_model.images[0].small_thumbnail);
+    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].small_thumbnail);
 }
 
 ImageViewAssistant.prototype.handleButtonPress = function (event) {
@@ -101,8 +87,8 @@ ImageViewAssistant.prototype.handleButtonPress = function (event) {
 
 ImageViewAssistant.prototype.handleButton2Press = function (event) {
     result = this.myPhotoDivElement.mojo.getCurrentParams();
-    this.showDialogBox("Current Params", "SourceImage="+result.sourceImage+
-    "  (See code for this button for other available parameters.)");
+    // this.showDialogBox("Current Params", "SourceImage="+result.sourceImage+
+    //"  (See code for this button for other available parameters.)");
     /*
      * Besides sourceImage, other result attributes are:
      * focusX
@@ -113,63 +99,49 @@ ImageViewAssistant.prototype.handleButton2Press = function (event) {
      */
 }
 
+// Do something when the image view changes
 ImageViewAssistant.prototype.imageViewChanged = function (event) {
-    /* Do something when the image view changes */
-    //this.showDialogBox("Image View Changed", "Flick image left and/or right to see other images.");
     Mojo.Log.info("Current image index: " + this.image_model.current_index);
     var idx = this.image_model.current_index;
     if (idx === 0) {
-        // Full size, thumb
-        this.myPhotoDivElement.mojo.leftUrlProvided("", "");
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image, this.image_model.images[idx + 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.leftUrlProvided("");
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].small_thumbnail);
     } else if (idx > 0 && idx < this.image_model.images.length) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image, this.image_model.images[idx - 1].small_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image, this.image_model.images[idx + 1].small_thumbnail);
-    } else if (idx === this.image_model.images.length) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image, this.image_model.images[idx - 1].small_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image, this.image_model.images[idx].small_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided("", "");
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].small_thumbnail);
+    } else if (idx === this.image_model.images.length - 1) {
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided("");
     }
 }
 
+// A flick to the right triggers a scroll to the left
 ImageViewAssistant.prototype.wentLeft = function (event) {
-    /* Do something when the user flicks to the right 
-     * like picking a different image for the left image.
-     */
-    //this.showDialogBox("Image View Changed", "Flicked right to see left picture.");
     if (this.image_model.current_index >= 1) {
         this.image_model.current_index -= 1;
         this.controller.modelChanged(this.image_model, this);
     }
 }
 
+// A flick to the left triggers a scroll to the right
 ImageViewAssistant.prototype.wentRight = function (event) {
-    /* Do something when the user flicks to the left 
-     * like picking a different image for the right image.
-     */
-    //this.showDialogBox("Image View Changed", "Flicked left to see right picture.");
-    if (this.image_model.current_index <= this.image_model.images.length) {
+    if (this.image_model.current_index < this.image_model.images.length - 1) {
         this.image_model.current_index += 1;
         this.controller.modelChanged(this.image_model, this);
     }
 }
 
-ImageViewAssistant.prototype.activate = function () {
-    /* You can show an image on startup from here if you want */
-    //this.myPhotoDivElement.mojo.centerUrlProvided('images/pre_01.png','images/edit.png');
-}
+// You can show an image on startup from here if you want
+ImageViewAssistant.prototype.activate = function () {}
 
-/*
-* Cleanup anything we did in the activate function
-*/
-ImageViewAssistant.prototype.deactivate = function () { }
+// Cleanup anything we did in the activate function
+ImageViewAssistant.prototype.deactivate = function () {}
 
-/*
- * Cleanup anything we did in setup function
- */
-ImageViewAssistant.prototype.cleanup = function (){
+// Cleanup anything we did in setup function
+ImageViewAssistant.prototype.cleanup = function () {
     Mojo.Event.stopListening(this.controller.get('myPhotoDiv'),Mojo.Event.imageViewChanged,this.imageViewChanged);
     Mojo.Event.stopListening(this.controller.get('push_button'),Mojo.Event.tap, this.handleButtonPress);
     Mojo.Event.stopListening(this.controller.get('push_button2'),Mojo.Event.tap, this.handleButton2Press);

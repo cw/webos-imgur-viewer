@@ -1,11 +1,11 @@
 {
-	"id": "com.christianwilcox.imgurviewer",
-	"version": "0.1.0",
-	"vendor": "Christian Wilcox",
-	"vendorurl": "http://christianwilcox.com",
-	"type": "web",
-	"main": "index.html",
-	"title": "ImgurViewer",
-	"splashicon": "images/Imgur_Logo_Icon_bigger.png",
-	"icon": "icon.png"
+  "id": "com.christianwilcox.imgurviewer",
+  "version": "0.2.0",
+  "vendor": "Christian Wilcox",
+  "vendorurl": "http://christianwilcox.com",
+  "type": "web",
+  "main": "index.html",
+  "title": "ImgurViewer",
+  "splashicon": "images/Imgur_Logo_Icon_bigger.png",
+  "icon": "icon.png"
 }

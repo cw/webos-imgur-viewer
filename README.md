@@ -1,3 +1,4 @@
 # webOS imgur viewer #
 
-This app provides a webOS interface to the image gallery on [http://imgur.com/](http://imgur.com/)
+This app provides a webOS interface to the [imgur](http://imgur.com/) image
+gallery.

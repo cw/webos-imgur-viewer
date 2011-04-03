@@ -7,5 +7,6 @@
   "main": "index.html",
   "title": "ImgurViewer",
   "splashicon": "images/Imgur_Logo_Icon_bigger.png",
-  "icon": "icon.png"
+  "icon": "icon.png",
+  "theme": "light"
 }

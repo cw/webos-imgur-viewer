@@ -5,8 +5,6 @@ ImageViewAssistant.prototype.setup = function () {
         noExtractFS: true //optional, turn off using extractfs to speed up renders.
     };
     this.image_model = {
-        //backgroundImage : 'images/glacier.png',
-        //background: 'black', //You can set an image or a color
         onLeftFunction : this.wentLeft.bind(this),
         onRightFunction : this.wentRight.bind(this),
         images: [],
@@ -37,23 +35,15 @@ ImageViewAssistant.prototype.getImageUrls = function () {
         page = 1, // integer above 0
         url = "http://api.imgur.com/2/gallery.json?sort=" + sort + 
               "&view=" + view + "&page=" + page + "&count=" + count,
+        // TODO implement OAuth
         request = new Ajax.Request(url, {
             method: 'get',
             asynchronous: true,
             evalJSON: "false",
             onSuccess: this.parseResult.bind(this),
-            on0: function (ajaxResponse) {
-                // connection failed, typically because the server is overloaded or has gone down since the page loaded
-                Mojo.Log.error("Connection failed");
-            },
-            onFailure: function (response) {
-                // Request failed (404, that sort of thing)
-                Mojo.Log.error("Request failed");
-            },
-            onException: function (request, ex) {
-                // An exception was thrown
-                Mojo.Log.error("Exception");
-            },
+            on0: function (ajaxResponse) { Mojo.Log.error("Connection failed"); },
+            onFailure: function (response) { Mojo.Log.error("Request failed"); },
+            onException: function (request, ex) { Mojo.Log.error("Exception"); },
         });
 }
 
@@ -67,16 +57,13 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
         Mojo.Log.error(e);
     }
     if (json.images) {
-        for (var img in json.images) {
-            image_list.push(json.images[img]);
-        }
+        for (var img in json.images) { image_list.push(json.images[img]); }
+        this.image_model.images = image_list;
+        this.controller.modelChanged(this.image_model, this);
+        this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
     } else {
         Mojo.Log.info("json object has no images");
     }
-
-    this.image_model.images = image_list;
-    this.controller.modelChanged(this.image_model, this);
-    this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
 }
 
 // Do something when the image view changes

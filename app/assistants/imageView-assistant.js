@@ -23,8 +23,9 @@ ImageViewAssistant.prototype.setup = function () {
         this.model = { spinning: false }
     );
 
-    this.imageViewChanged = this.imageViewChanged.bindAsEventListener(this);
-    Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChanged);
+    this.imageViewChangedHandler = this.imageViewChanged.bindAsEventListener(this);
+    this.orientationChangeHandler = this.orientationChanged.bindAsEventListener(this);
+    Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
 }
 
 ImageViewAssistant.prototype.getImageUrls = function () {
@@ -86,6 +87,11 @@ ImageViewAssistant.prototype.imageViewChanged = function (event) {
     $("main-hdr").innerHTML = this.image_model.images[idx].message;
 }
 
+// Handle orientation changes
+ImageViewAssistant.prototype.orientationChanged = function (event) {
+    Mojo.Log.info("Resize imgurView width/height to match screen dimensions");
+}
+
 // A flick to the right triggers a scroll to the left
 ImageViewAssistant.prototype.wentLeft = function (event) {
     if (this.image_model.current_index >= 1) {
@@ -102,15 +108,19 @@ ImageViewAssistant.prototype.wentRight = function (event) {
     }
 }
 
-// You can show an image on startup from here if you want
-ImageViewAssistant.prototype.activate = function () {}
+// Start listening to orientation changes
+ImageViewAssistant.prototype.activate = function () {
+    this.controller.listen(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
+}
 
-// Cleanup anything we did in the activate function
-ImageViewAssistant.prototype.deactivate = function () {}
+// Stop listening to orientation changes
+ImageViewAssistant.prototype.deactivate = function () {
+    this.controller.stopListening(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
+}
 
 // Cleanup anything we did in setup function
 ImageViewAssistant.prototype.cleanup = function () {
-    Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChanged);
+    Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
 }
 
 // This function will popup a dialog, displaying the message passed in.

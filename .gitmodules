@@ -1,0 +1,3 @@
+[submodule "lib/oauth"]
+path = lib/oauth
+url = git://github.com/jfelectron/OAuth-for-WebOS.git

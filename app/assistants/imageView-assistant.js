@@ -89,7 +89,21 @@ ImageViewAssistant.prototype.imageViewChanged = function (event) {
 
 // Handle orientation changes
 ImageViewAssistant.prototype.orientationChanged = function (event) {
-    Mojo.Log.info("Resize imgurView width/height to match screen dimensions");
+    //Mojo.Log.info("Resize imgurView width/height to match screen dimensions");
+    var width = Mojo.Environment.DeviceInfo.screenWidth,
+        height = Mojo.Environment.DeviceInfo.screenHeight,
+        orientation = this.controller.stageController.getWindowOrientation();
+    Mojo.Log.info("screen dims: " + width + ", " + height);
+    Mojo.Log.info("orientation: " + orientation);
+    Mojo.Log.info("style width before: " + $("imgurView").style.width);
+    switch (orientation) {
+        case "left": case "right":
+            $("imgurView").setStyle("width: 480px; height: 320px;"); break;
+        case "up": case "down":
+            $("imgurView").setStyle("width: 320px; height: 480px;"); break;
+    }
+    Mojo.Log.info("style width after: " + $("imgurView").style.width);
+    //$("#imgurView").
 }
 
 // A flick to the right triggers a scroll to the left

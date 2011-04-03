@@ -1,4 +1,5 @@
 [
+    {"source": "app/auth_config.js"},
     {"source": "app/assistants/stage-assistant.js"},
     {
         "scenes": "galleryView",

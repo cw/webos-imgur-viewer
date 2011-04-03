@@ -13,8 +13,8 @@ ImageViewAssistant.prototype.setup = function () {
         current_index: 0
     }
     this.getImageUrls();
-    this.controller.setupWidget('myPhotoDiv', attributes, this.image_model);
-    this.myPhotoDivElement = $('myPhotoDiv');
+    this.controller.setupWidget('imgurView', attributes, this.image_model);
+    this.imgurViewElement = $('imgurView');
 
     // TODO reset width/height of image view on orientation change
     this.controller.stageController.setWindowOrientation('free');
@@ -26,7 +26,7 @@ ImageViewAssistant.prototype.setup = function () {
     );
 
     this.imageViewChanged = this.imageViewChanged.bindAsEventListener(this);
-    Mojo.Event.listen(this.controller.get('myPhotoDiv'), Mojo.Event.imageViewChanged, this.imageViewChanged);
+    Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChanged);
 }
 
 ImageViewAssistant.prototype.getImageUrls = function () {
@@ -76,7 +76,7 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
 
     this.image_model.images = image_list;
     this.controller.modelChanged(this.image_model, this);
-    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
+    this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
 }
 
 // Do something when the image view changes
@@ -84,17 +84,17 @@ ImageViewAssistant.prototype.imageViewChanged = function (event) {
     Mojo.Log.info("Current image index: " + this.image_model.current_index);
     var idx = this.image_model.current_index;
     if (idx === 0) {
-        this.myPhotoDivElement.mojo.leftUrlProvided("");
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
+        this.imgurViewElement.mojo.leftUrlProvided("");
+        this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+        this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
     } else if (idx > 0 && idx < this.image_model.images.length) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
+        this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
+        this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+        this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
     } else if (idx === this.image_model.images.length - 1) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided("");
+        this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
+        this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+        this.imgurViewElement.mojo.rightUrlProvided("");
     }
     $("main-hdr").innerHTML = this.image_model.images[idx].message;
 }
@@ -123,7 +123,7 @@ ImageViewAssistant.prototype.deactivate = function () {}
 
 // Cleanup anything we did in setup function
 ImageViewAssistant.prototype.cleanup = function () {
-    Mojo.Event.stopListening(this.controller.get('myPhotoDiv'), Mojo.Event.imageViewChanged, this.imageViewChanged);
+    Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChanged);
 }
 
 // This function will popup a dialog, displaying the message passed in.

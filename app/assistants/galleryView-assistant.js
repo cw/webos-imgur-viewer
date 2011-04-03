@@ -1,6 +1,6 @@
-function ImageViewAssistant() {}
+function GalleryViewAssistant() {}
 
-ImageViewAssistant.prototype.setup = function () {
+GalleryViewAssistant.prototype.setup = function () {
     var attributes = {
         noExtractFS: true //optional, turn off using extractfs to speed up renders.
     };
@@ -28,7 +28,7 @@ ImageViewAssistant.prototype.setup = function () {
     Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
 }
 
-ImageViewAssistant.prototype.getImageUrls = function () {
+GalleryViewAssistant.prototype.getImageUrls = function () {
     // TODO allow various sorting/filtering options, cache results
     var sort = "latest", // latest, popular
         view = "all", // week, month, all
@@ -48,7 +48,7 @@ ImageViewAssistant.prototype.getImageUrls = function () {
         });
 }
 
-ImageViewAssistant.prototype.parseResult = function (transport) {
+GalleryViewAssistant.prototype.parseResult = function (transport) {
     var image_list = [],
         json,
         data = transport.responseText;
@@ -68,7 +68,7 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
 }
 
 // Do something when the image view changes
-ImageViewAssistant.prototype.imageViewChanged = function (event) {
+GalleryViewAssistant.prototype.imageViewChanged = function (event) {
     Mojo.Log.info("Current image index: " + this.image_model.current_index);
     var idx = this.image_model.current_index;
     if (idx === 0) {
@@ -88,7 +88,7 @@ ImageViewAssistant.prototype.imageViewChanged = function (event) {
 }
 
 // Handle orientation changes
-ImageViewAssistant.prototype.orientationChanged = function (event) {
+GalleryViewAssistant.prototype.orientationChanged = function (event) {
     //Mojo.Log.info("Resize imgurView width/height to match screen dimensions");
     var width = Mojo.Environment.DeviceInfo.screenWidth,
         height = Mojo.Environment.DeviceInfo.screenHeight,
@@ -107,7 +107,7 @@ ImageViewAssistant.prototype.orientationChanged = function (event) {
 }
 
 // A flick to the right triggers a scroll to the left
-ImageViewAssistant.prototype.wentLeft = function (event) {
+GalleryViewAssistant.prototype.wentLeft = function (event) {
     if (this.image_model.current_index >= 1) {
         this.image_model.current_index -= 1;
         this.controller.modelChanged(this.image_model, this);
@@ -115,7 +115,7 @@ ImageViewAssistant.prototype.wentLeft = function (event) {
 }
 
 // A flick to the left triggers a scroll to the right
-ImageViewAssistant.prototype.wentRight = function (event) {
+GalleryViewAssistant.prototype.wentRight = function (event) {
     if (this.image_model.current_index < this.image_model.images.length - 1) {
         this.image_model.current_index += 1;
         this.controller.modelChanged(this.image_model, this);
@@ -123,22 +123,22 @@ ImageViewAssistant.prototype.wentRight = function (event) {
 }
 
 // Start listening to orientation changes
-ImageViewAssistant.prototype.activate = function () {
+GalleryViewAssistant.prototype.activate = function () {
     this.controller.listen(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
 }
 
 // Stop listening to orientation changes
-ImageViewAssistant.prototype.deactivate = function () {
+GalleryViewAssistant.prototype.deactivate = function () {
     this.controller.stopListening(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
 }
 
 // Cleanup anything we did in setup function
-ImageViewAssistant.prototype.cleanup = function () {
+GalleryViewAssistant.prototype.cleanup = function () {
     Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
 }
 
 // This function will popup a dialog, displaying the message passed in.
-ImageViewAssistant.prototype.showDialogBox = function (title, message) {
+GalleryViewAssistant.prototype.showDialogBox = function (title, message) {
     this.controller.showAlertDialog({
         onChoose: function (value) {},
         title: title,

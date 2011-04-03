@@ -16,6 +16,9 @@ ImageViewAssistant.prototype.setup = function () {
     this.controller.setupWidget('myPhotoDiv', attributes, this.image_model);
     this.myPhotoDivElement = $('myPhotoDiv');
 
+    // TODO reset width/height of image view on orientation change
+    this.controller.stageController.setWindowOrientation('free');
+
     // TODO implement show spinner while retrieving image JSON
     this.controller.setupWidget("spinnerId",
         this.attributes = { spinnerSize: "large" },
@@ -23,14 +26,17 @@ ImageViewAssistant.prototype.setup = function () {
     );
 
     this.imageViewChanged = this.imageViewChanged.bindAsEventListener(this);
-    this.handleButtonPress = this.handleButtonPress.bind(this);
     Mojo.Event.listen(this.controller.get('myPhotoDiv'), Mojo.Event.imageViewChanged, this.imageViewChanged);
-    Mojo.Event.listen(this.controller.get('push_button'), Mojo.Event.tap, this.handleButtonPress);
 }
 
 ImageViewAssistant.prototype.getImageUrls = function () {
-    // currently using Imgur API version 1 - TODO this should use version 2 instead
-    var url = "http://imgur.com/api/gallery.json",
+    // TODO allow various sorting/filtering options, cache results
+    var sort = "latest", // latest, popular
+        view = "all", // week, month, all
+        count = 50, // integer between 0 and 50
+        page = 1, // integer above 0
+        url = "http://api.imgur.com/2/gallery.json?sort=" + sort + 
+              "&view=" + view + "&page=" + page + "&count=" + count,
         request = new Ajax.Request(url, {
             method: 'get',
             asynchronous: true,
@@ -67,19 +73,10 @@ ImageViewAssistant.prototype.parseResult = function (transport) {
     } else {
         Mojo.Log.info("json object has no images");
     }
+
     this.image_model.images = image_list;
     this.controller.modelChanged(this.image_model, this);
-    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].small_thumbnail);
-}
-
-ImageViewAssistant.prototype.handleButtonPress = function (event) {
-    /* 
-     * You can manually set the width and height of the image
-     * space as below or you can let the widget pick the size
-     * itself.
-     * Uncomment the below to see what it does.
-     */
-    //this.myPhotoDivElement.mojo.manualSize('300','100');
+    this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
 }
 
 // Do something when the image view changes
@@ -88,17 +85,18 @@ ImageViewAssistant.prototype.imageViewChanged = function (event) {
     var idx = this.image_model.current_index;
     if (idx === 0) {
         this.myPhotoDivElement.mojo.leftUrlProvided("");
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
     } else if (idx > 0 && idx < this.image_model.images.length) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].small_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
-        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].small_thumbnail);
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+        this.myPhotoDivElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
     } else if (idx === this.image_model.images.length - 1) {
-        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].small_thumbnail);
-        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].small_thumbnail);
+        this.myPhotoDivElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
+        this.myPhotoDivElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
         this.myPhotoDivElement.mojo.rightUrlProvided("");
     }
+    $("main-hdr").innerHTML = this.image_model.images[idx].message;
 }
 
 // A flick to the right triggers a scroll to the left
@@ -125,8 +123,7 @@ ImageViewAssistant.prototype.deactivate = function () {}
 
 // Cleanup anything we did in setup function
 ImageViewAssistant.prototype.cleanup = function () {
-    Mojo.Event.stopListening(this.controller.get('myPhotoDiv'),Mojo.Event.imageViewChanged,this.imageViewChanged);
-    Mojo.Event.stopListening(this.controller.get('push_button'),Mojo.Event.tap, this.handleButtonPress);
+    Mojo.Event.stopListening(this.controller.get('myPhotoDiv'), Mojo.Event.imageViewChanged, this.imageViewChanged);
 }
 
 // This function will popup a dialog, displaying the message passed in.

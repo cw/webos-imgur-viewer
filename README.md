@@ -8,7 +8,7 @@ This application currently runs on webOS versions 1.x and 2.x. Support for webOS
 ### Planned features ###
 
 * webOS 3.0 support (tablets!).
-* Post image comments to Imgur site.
+* Post image captions to Imgur site.
 * Allow image downloads to device.
 * Share image via email/Facebook/etc.
 * Possibly implement Imgur as a Synergy account for simple uploading of device captured images to Imgur site.

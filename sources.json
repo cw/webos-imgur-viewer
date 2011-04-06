@@ -4,10 +4,10 @@
     {
         "scenes": "galleryView",
         "source": "app/assistants/galleryView-assistant.js"
-    }
-    {"source": "lib/oauth/app/assistants/utils/oauth.js"},
+    },
+    {"source": "app/assistants/utils/oauth.js"},
     {
         "scenes": "oauth",
-        "source": "lib/oauth/app/assistants/oauth-assistant.js"
+        "source": "app/assistants/oauth-assistant.js"
     }
 ]

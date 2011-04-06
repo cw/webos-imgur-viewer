@@ -15,6 +15,7 @@ GalleryViewAssistant.prototype.setup = function () {
     this.imgurViewElement = $('imgurView');
 
     // TODO reset width/height of image view on orientation change
+    // see https://github.com/cw/webos-imgur-viewer/issues#issue/1
     this.controller.stageController.setWindowOrientation('free');
 
     // TODO implement show spinner while retrieving image JSON
@@ -22,6 +23,13 @@ GalleryViewAssistant.prototype.setup = function () {
         this.attributes = { spinnerSize: "large" },
         this.model = { spinning: false }
     );
+
+    this.categoryMenuModel = { label: $L('Category'), items: [{label: $L('All'), command:'cat-all', shortcut:'l'},
+        {label: $L('Business'), command:'cat-business' },
+        {label: $L('Personal'), command:'cat-personal', shortcut:'p'},
+        {label: $L('Unfiled'), command:'cat-unfiled', shortcut:'u'}
+    ]};
+    this.controller.setupWidget('category-menu', undefined, this.categoryMenuModel);
 
     this.imageViewChangedHandler = this.imageViewChanged.bindAsEventListener(this);
     this.orientationChangeHandler = this.orientationChanged.bindAsEventListener(this);

@@ -1,3 +1,0 @@
-[submodule "lib/oauth"]
-	path = lib/oauth
-	url = git://github.com/fillito/WebOS-OAuth.git

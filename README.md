@@ -16,3 +16,7 @@ This application currently runs on webOS versions 1.x and 2.x. Support for webOS
 ### Mojo APIs used by this application ###
 
 * [ImageView](https://developer.palm.com/content/api/reference/mojo/widgets/image-view.html)
+
+### Application Dependencies ###
+
+* [WebOS-OAuth](https://github.com/fillito/WebOS-OAuth)

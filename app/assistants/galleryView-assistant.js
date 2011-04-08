@@ -34,6 +34,8 @@ GalleryViewAssistant.prototype.setup = function () {
     this.imageViewChangedHandler = this.imageViewChanged.bindAsEventListener(this);
     this.orientationChangeHandler = this.orientationChanged.bindAsEventListener(this);
     Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
+    this.showImageMenuHandler = this.showImageMenu.bindAsEventListener(this)
+    Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.tap, this.showImageMenuHandler);
 }
 
 GalleryViewAssistant.prototype.getImageUrls = function () {
@@ -114,6 +116,24 @@ GalleryViewAssistant.prototype.orientationChanged = function (event) {
     //$("#imgurView").
 }
 
+// Handle image taps
+GalleryViewAssistant.prototype.showImageMenu = function (event) {
+    this.popupIndex = event.index;
+    this.controller.popupSubmenu({
+        onChoose: this.popupHandler,
+        items: [
+            {label: 'View on Imgur', command: 'view-site'},
+            {label: 'View comments', command: 'view-comments'},
+            {label: 'Share', command: 'share-image'}
+        ]
+    });
+}
+
+// Something
+GalleryViewAssistant.prototype.popupHandler = function (command) {
+  // do something with the incoming command 
+}
+
 // A flick to the right triggers a scroll to the left
 GalleryViewAssistant.prototype.wentLeft = function (event) {
     if (this.image_model.current_index >= 1) {
@@ -143,6 +163,7 @@ GalleryViewAssistant.prototype.deactivate = function () {
 // Cleanup anything we did in setup function
 GalleryViewAssistant.prototype.cleanup = function () {
     Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
+    Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.tap, this.showImageMenuHandler);
 }
 
 // This function will popup a dialog, displaying the message passed in.

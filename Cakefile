@@ -32,3 +32,10 @@ task 'package', "Package app into .ipkg in ~/packages", (options) ->
   log "Packaging app", green
   exec 'palm-package --exclude-from=.packageignore -o ~/packages .', (err, stdout, stderr) ->
     throw err if err
+
+task 'install', "Install app on both emulator and usb-attached device", (option) ->
+  log "Installing app", green
+  version = "0.4.0"
+  for device in ["usb", "tcp"]
+    exec "palm-install -d #{device} ~/packages/com.christianwilcox.imgurviewer_#{version}_all.ipk", (err, stdout, stderr) ->
+      throw err if err

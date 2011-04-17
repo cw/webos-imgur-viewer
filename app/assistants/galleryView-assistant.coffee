@@ -1,6 +1,7 @@
 class GalleryViewAssistant
 
-  @setup: ->
+  setup: ->
+    Mojo.Log.info("starting setup")
     attributes =
         noExtractFS: true
     @image_model =
@@ -8,8 +9,11 @@ class GalleryViewAssistant
         onRightFunction: @wentRight
         images: []
         current_index: 0
+    Mojo.Log.info("calling getImageUrls")
     @getImageUrls()
+    Mojo.Log.info("setting up imgurView widget")
     @controller.setupWidget('imgurView', attributes, @image_model)
+    Mojo.Log.info("set up imgurView widget")
     @imgurViewElement = $('imgurView')
 
     # TODO reset width/height of image view on orientation change
@@ -29,7 +33,7 @@ class GalleryViewAssistant
     @showImageMenuHandler = @showImageMenu.bindAsEventListener(this)
     Mojo.Event.listen(@controller.get('imgurView'), Mojo.Event.tap, @showImageMenuHandler)
 
-  @getImageUrls: ->
+  getImageUrls: ->
     # TODO allow various sorting/filtering options, cache results
     sort = "latest" # latest, popular
     view = "all" # week, month, all
@@ -38,6 +42,7 @@ class GalleryViewAssistant
     url = "http://api.imgur.com/2/gallery.json?sort=" + sort + 
           "&view=" + view + "&page=" + page + "&count=" + count
     # TODO implement OAuth
+    Mojo.Log.info("calling get image gallery request")
     request = new Ajax.Request(url, {
         method: 'get'
         asynchronous: true
@@ -51,7 +56,7 @@ class GalleryViewAssistant
           Mojo.Log.error("Exception")
     })
 
-  @parseResult: (transport) ->
+  parseResult: (transport) ->
     image_list = []
     data = transport.responseText
     try
@@ -67,7 +72,7 @@ class GalleryViewAssistant
         Mojo.Log.info("json object has no images")
 
   # Do something when the image view changes
-  @imageViewChanged: (event) ->
+  imageViewChanged: (event) ->
       Mojo.Log.info("Current image index: " + @image_model.current_index)
       idx = @image_model.current_index
       # Now looking at the first image
@@ -88,7 +93,7 @@ class GalleryViewAssistant
       $("main-hdr").innerHTML = @image_model.images[idx].message
 
   # Handle orientation changes
-  @orientationChanged: (event) ->
+  orientationChanged: (event) ->
     width = Mojo.Environment.DeviceInfo.screenWidth
     height = Mojo.Environment.DeviceInfo.screenHeight
     orientation = @controller.stageController.getWindowOrientation()
@@ -103,7 +108,7 @@ class GalleryViewAssistant
     Mojo.Log.info("style width after: " + $("imgurView").style.width)
 
   # Handle image taps
-  @showImageMenu: (event) ->
+  showImageMenu: (event) ->
     @popupIndex = event.index
     @controller.popupSubmenu(
       onChoose: @popupHandler
@@ -115,35 +120,35 @@ class GalleryViewAssistant
     )
 
   # TODO Do something with the incoming command 
-  @popupHandler: (command) ->
+  popupHandler: (command) ->
 
   # A flick to the right triggers a scroll to the left
-  @wentLeft: (event) =>
+  wentLeft: (event) =>
     if @image_model.current_index >= 1
         @image_model.current_index -= 1
         @controller.modelChanged(@image_model, this)
 
   # A flick to the left triggers a scroll to the right
-  @wentRight: (event) =>
+  wentRight: (event) =>
     if @image_model.current_index < @image_model.images.length - 1
         @image_model.current_index += 1
         @controller.modelChanged(@image_model, this)
 
   # Start listening to orientation changes
-  @activate: ->
+  activate: ->
     @controller.listen(@controller.stageController.document, Mojo.Event.orientationChange, @orientationChangeHandler)
 
   # Stop listening to orientation changes
-  @deactivate: ->
+  deactivate: ->
     @controller.stopListening(@controller.stageController.document, Mojo.Event.orientationChange, @orientationChangeHandler)
 
   # Cleanup anything we did in setup function
-  @cleanup: ->
+  cleanup: ->
     Mojo.Event.stopListening(@controller.get('imgurView'), Mojo.Event.imageViewChanged, @imageViewChangedHandler)
     Mojo.Event.stopListening(@controller.get('imgurView'), Mojo.Event.tap, @showImageMenuHandler)
 
   # This function will popup a dialog, displaying the message passed in
-  @showDialogBox: (title, message) ->
+  showDialogBox: (title, message) ->
     @controller.showAlertDialog(
         onChoose: (value) ->
         title: title

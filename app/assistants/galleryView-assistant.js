@@ -2,11 +2,12 @@ var GalleryViewAssistant;
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 GalleryViewAssistant = (function() {
   function GalleryViewAssistant() {
-    this.GalleryViewAssistant = __bind(this.GalleryViewAssistant, this);;
-    this.GalleryViewAssistant = __bind(this.GalleryViewAssistant, this);;
+    this.wentRight = __bind(this.wentRight, this);;
+    this.wentLeft = __bind(this.wentLeft, this);;
   }
-  GalleryViewAssistant.setup = function() {
+  GalleryViewAssistant.prototype.setup = function() {
     var attributes, spinner_attributes, spinner_model;
+    Mojo.Log.info("starting setup");
     attributes = {
       noExtractFS: true
     };
@@ -16,8 +17,11 @@ GalleryViewAssistant = (function() {
       images: [],
       current_index: 0
     };
+    Mojo.Log.info("calling getImageUrls");
     this.getImageUrls();
+    Mojo.Log.info("setting up imgurView widget");
     this.controller.setupWidget('imgurView', attributes, this.image_model);
+    Mojo.Log.info("set up imgurView widget");
     this.imgurViewElement = $('imgurView');
     this.controller.stageController.setWindowOrientation('free');
     spinner_attributes = {
@@ -33,13 +37,14 @@ GalleryViewAssistant = (function() {
     this.showImageMenuHandler = this.showImageMenu.bindAsEventListener(this);
     return Mojo.Event.listen(this.controller.get('imgurView'), Mojo.Event.tap, this.showImageMenuHandler);
   };
-  GalleryViewAssistant.getImageUrls = function() {
+  GalleryViewAssistant.prototype.getImageUrls = function() {
     var count, page, request, sort, url, view;
     sort = "latest";
     view = "all";
     count = 50;
     page = 1;
     url = "http://api.imgur.com/2/gallery.json?sort=" + sort + "&view=" + view + "&page=" + page + "&count=" + count;
+    Mojo.Log.info("calling get image gallery request");
     return request = new Ajax.Request(url, {
       method: 'get',
       asynchronous: true,
@@ -56,7 +61,7 @@ GalleryViewAssistant = (function() {
       }
     });
   };
-  GalleryViewAssistant.parseResult = function(transport) {
+  GalleryViewAssistant.prototype.parseResult = function(transport) {
     var data, image_list, img, json, _i, _len, _ref;
     image_list = [];
     data = transport.responseText;
@@ -78,7 +83,7 @@ GalleryViewAssistant = (function() {
       return Mojo.Log.info("json object has no images");
     }
   };
-  GalleryViewAssistant.imageViewChanged = function(event) {
+  GalleryViewAssistant.prototype.imageViewChanged = function(event) {
     var idx;
     Mojo.Log.info("Current image index: " + this.image_model.current_index);
     idx = this.image_model.current_index;
@@ -97,7 +102,7 @@ GalleryViewAssistant = (function() {
     }
     return $("main-hdr").innerHTML = this.image_model.images[idx].message;
   };
-  GalleryViewAssistant.orientationChanged = function(event) {
+  GalleryViewAssistant.prototype.orientationChanged = function(event) {
     var height, orientation, width;
     width = Mojo.Environment.DeviceInfo.screenWidth;
     height = Mojo.Environment.DeviceInfo.screenHeight;
@@ -116,7 +121,7 @@ GalleryViewAssistant = (function() {
     }
     return Mojo.Log.info("style width after: " + $("imgurView").style.width);
   };
-  GalleryViewAssistant.showImageMenu = function(event) {
+  GalleryViewAssistant.prototype.showImageMenu = function(event) {
     this.popupIndex = event.index;
     return this.controller.popupSubmenu({
       onChoose: this.popupHandler,
@@ -134,30 +139,30 @@ GalleryViewAssistant = (function() {
       ]
     });
   };
-  GalleryViewAssistant.popupHandler = function(command) {};
-  GalleryViewAssistant.wentLeft = function(event) {
+  GalleryViewAssistant.prototype.popupHandler = function(command) {};
+  GalleryViewAssistant.prototype.wentLeft = function(event) {
     if (this.image_model.current_index >= 1) {
       this.image_model.current_index -= 1;
       return this.controller.modelChanged(this.image_model, this);
     }
   };
-  GalleryViewAssistant.wentRight = function(event) {
+  GalleryViewAssistant.prototype.wentRight = function(event) {
     if (this.image_model.current_index < this.image_model.images.length - 1) {
       this.image_model.current_index += 1;
       return this.controller.modelChanged(this.image_model, this);
     }
   };
-  GalleryViewAssistant.activate = function() {
+  GalleryViewAssistant.prototype.activate = function() {
     return this.controller.listen(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
   };
-  GalleryViewAssistant.deactivate = function() {
+  GalleryViewAssistant.prototype.deactivate = function() {
     return this.controller.stopListening(this.controller.stageController.document, Mojo.Event.orientationChange, this.orientationChangeHandler);
   };
-  GalleryViewAssistant.cleanup = function() {
+  GalleryViewAssistant.prototype.cleanup = function() {
     Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.imageViewChanged, this.imageViewChangedHandler);
     return Mojo.Event.stopListening(this.controller.get('imgurView'), Mojo.Event.tap, this.showImageMenuHandler);
   };
-  GalleryViewAssistant.showDialogBox = function(title, message) {
+  GalleryViewAssistant.prototype.showDialogBox = function(title, message) {
     return this.controller.showAlertDialog({
       onChoose: function(value) {},
       title: title,

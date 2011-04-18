@@ -6,7 +6,7 @@ GalleryViewAssistant = (function() {
     this.wentLeft = __bind(this.wentLeft, this);;
   }
   GalleryViewAssistant.prototype.setup = function() {
-    var attributes, spinner_attributes, spinner_model;
+    var attributes, height, spinner_attributes, spinner_model, width;
     Mojo.Log.info("starting setup");
     attributes = {
       noExtractFS: true
@@ -23,6 +23,9 @@ GalleryViewAssistant = (function() {
     this.controller.setupWidget('imgurView', attributes, this.image_model);
     Mojo.Log.info("set up imgurView widget");
     this.imgurViewElement = $('imgurView');
+    width = Mojo.Environment.DeviceInfo.screenWidth;
+    height = Mojo.Environment.DeviceInfo.screenHeight;
+    $("imgurView").setStyle("width: " + width + "px; height: " + height + "px;");
     this.controller.stageController.setWindowOrientation('free');
     spinner_attributes = {
       spinnerSize: "large"
@@ -78,7 +81,7 @@ GalleryViewAssistant = (function() {
       }
       this.image_model.images = image_list;
       this.controller.modelChanged(this.image_model, this);
-      return this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[0].large_thumbnail);
+      return this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[0].original_image);
     } else {
       return Mojo.Log.info("json object has no images");
     }
@@ -89,15 +92,15 @@ GalleryViewAssistant = (function() {
     idx = this.image_model.current_index;
     if (idx === 0) {
       this.imgurViewElement.mojo.leftUrlProvided("");
-      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
-      this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
+      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image);
+      this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image);
     } else if (idx > 0 && idx < this.image_model.images.length) {
-      this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
-      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
-      this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].large_thumbnail);
+      this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image);
+      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image);
+      this.imgurViewElement.mojo.rightUrlProvided(this.image_model.images[idx + 1].original_image);
     } else if (idx === this.image_model.images.length - 1) {
-      this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].large_thumbnail);
-      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].large_thumbnail);
+      this.imgurViewElement.mojo.leftUrlProvided(this.image_model.images[idx - 1].original_image);
+      this.imgurViewElement.mojo.centerUrlProvided(this.image_model.images[idx].original_image);
       this.imgurViewElement.mojo.rightUrlProvided("");
     }
     return $("main-hdr").innerHTML = this.image_model.images[idx].message;
@@ -113,11 +116,11 @@ GalleryViewAssistant = (function() {
     switch (orientation) {
       case "left":
       case "right":
-        $("imgurView").setStyle("width: 480px; height: 320px;");
+        $("imgurView").setStyle("width: " + width + "px; height: " + height + "px;");
         break;
       case "up":
       case "down":
-        $("imgurView").setStyle("width: 320px; height: 480px;");
+        $("imgurView").setStyle("width: " + height + "px; height: " + width + "px;");
     }
     return Mojo.Log.info("style width after: " + $("imgurView").style.width);
   };

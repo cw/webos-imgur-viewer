@@ -15,6 +15,9 @@ class GalleryViewAssistant
     @controller.setupWidget('imgurView', attributes, @image_model)
     Mojo.Log.info("set up imgurView widget")
     @imgurViewElement = $('imgurView')
+    width = Mojo.Environment.DeviceInfo.screenWidth
+    height = Mojo.Environment.DeviceInfo.screenHeight
+    $("imgurView").setStyle("width: #{width}px; height: #{height}px;")
 
     # TODO reset width/height of image view on orientation change
     # see https://github.com/cw/webos-imgur-viewer/issues#issue/1
@@ -67,7 +70,7 @@ class GalleryViewAssistant
         image_list.push(img) for img in json.images
         @image_model.images = image_list
         @controller.modelChanged(@image_model, this)
-        @imgurViewElement.mojo.centerUrlProvided(@image_model.images[0].large_thumbnail)
+        @imgurViewElement.mojo.centerUrlProvided(@image_model.images[0].original_image)
     else
         Mojo.Log.info("json object has no images")
 
@@ -78,17 +81,17 @@ class GalleryViewAssistant
       # Now looking at the first image
       if idx is 0
           @imgurViewElement.mojo.leftUrlProvided("")
-          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].large_thumbnail)
-          @imgurViewElement.mojo.rightUrlProvided(@image_model.images[idx + 1].large_thumbnail)
+          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].original_image)
+          @imgurViewElement.mojo.rightUrlProvided(@image_model.images[idx + 1].original_image)
       # Now looking at image between first and last
       else if idx > 0 and idx < @image_model.images.length
-          @imgurViewElement.mojo.leftUrlProvided(@image_model.images[idx - 1].large_thumbnail)
-          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].large_thumbnail)
-          @imgurViewElement.mojo.rightUrlProvided(@image_model.images[idx + 1].large_thumbnail)
+          @imgurViewElement.mojo.leftUrlProvided(@image_model.images[idx - 1].original_image)
+          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].original_image)
+          @imgurViewElement.mojo.rightUrlProvided(@image_model.images[idx + 1].original_image)
       # Now looking at the last image
       else if idx is @image_model.images.length - 1
-          @imgurViewElement.mojo.leftUrlProvided(@image_model.images[idx - 1].large_thumbnail)
-          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].large_thumbnail)
+          @imgurViewElement.mojo.leftUrlProvided(@image_model.images[idx - 1].original_image)
+          @imgurViewElement.mojo.centerUrlProvided(@image_model.images[idx].original_image)
           @imgurViewElement.mojo.rightUrlProvided("")
       $("main-hdr").innerHTML = @image_model.images[idx].message
 
@@ -102,9 +105,9 @@ class GalleryViewAssistant
     Mojo.Log.info("style width before: #{$('imgurView').style.width}")
     switch orientation
         when "left", "right"
-            $("imgurView").setStyle("width: 480px; height: 320px;")
+            $("imgurView").setStyle("width: #{width}px; height: #{height}px;")
         when "up", "down"
-            $("imgurView").setStyle("width: 320px; height: 480px;")
+            $("imgurView").setStyle("width: #{height}px; height: #{width}px;")
     Mojo.Log.info("style width after: " + $("imgurView").style.width)
 
   # Handle image taps
